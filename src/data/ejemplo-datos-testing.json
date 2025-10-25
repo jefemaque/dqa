@@ -1,0 +1,49 @@
+{
+  "descripcion": "Datos de ejemplo para el dashboard de testing. El usuario puede cargar un archivo Excel con esta estructura.",
+  "estructura_esperada": {
+    "hoja1": "Resumen de Pruebas",
+    "columnas": ["Fecha", "Total Pruebas", "Aprobadas", "Fallidas", "Pendientes", "Tiempo Promedio (min)"]
+  },
+  "datos_ejemplo": [
+    {
+      "Fecha": "2025-01-01",
+      "Total Pruebas": 150,
+      "Aprobadas": 135,
+      "Fallidas": 10,
+      "Pendientes": 5,
+      "Tiempo Promedio (min)": 12.5
+    },
+    {
+      "Fecha": "2025-01-02",
+      "Total Pruebas": 180,
+      "Aprobadas": 165,
+      "Fallidas": 12,
+      "Pendientes": 3,
+      "Tiempo Promedio (min)": 11.8
+    },
+    {
+      "Fecha": "2025-01-03",
+      "Total Pruebas": 165,
+      "Aprobadas": 155,
+      "Fallidas": 8,
+      "Pendientes": 2,
+      "Tiempo Promedio (min)": 13.2
+    },
+    {
+      "Fecha": "2025-01-04",
+      "Total Pruebas": 200,
+      "Aprobadas": 185,
+      "Fallidas": 11,
+      "Pendientes": 4,
+      "Tiempo Promedio (min)": 12.0
+    },
+    {
+      "Fecha": "2025-01-05",
+      "Total Pruebas": 175,
+      "Aprobadas": 160,
+      "Fallidas": 13,
+      "Pendientes": 2,
+      "Tiempo Promedio (min)": 14.5
+    }
+  ]
+}
