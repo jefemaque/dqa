@@ -1,24 +1,29 @@
-# Dashboard de Indicadores de Fábrica de Testing
+# Dashboard QA - Métricas de Calidad de Testing
 
-Dashboard web interactivo para visualizar y analizar indicadores de calidad y resultados de pruebas de software. Permite cargar archivos Excel con datos de testing y genera automáticamente gráficos y métricas clave.
+Dashboard web interactivo para visualizar y analizar indicadores de calidad y resultados de pruebas de software. Permite cargar archivos Excel con datos de testing y genera automáticamente 21 KPIs con gráficos y métricas clave.
 
 ## Características
 
 - **Carga de archivos Excel**: Soporta formatos .xlsx, .xls y .ods
-- **Visualización de métricas**: Tarjetas informativas con indicadores clave
-- **Gráficos interactivos**:
-  - Tendencias de pruebas en el tiempo (gráfico de líneas)
-  - Distribución de resultados (gráfico de dona)
-- **Tabla de datos detallada**: Vista completa de todos los registros
-- **Diseño tipo AdminLTE**: Interfaz moderna y profesional
-- **Responsive**: Se adapta a diferentes tamaños de pantalla
+- **21 KPIs** distribuidos en 6 secciones:
+  - Casos de Prueba (6 KPIs)
+  - Defectos (9 KPIs)
+  - Efectividad (4 KPIs)
+  - Desviaciones (2 KPIs)
+  - Tendencias Mensuales
+  - Diagrama de Gantt interactivo
+- **Filtros globales**: Año, Cartera, Subcartera, Proyecto, Estado
+- **Visualizaciones avanzadas**: Gráficos de línea, área, gauges, barras
+- **Gantt con doble comportamiento**: Vista general de proyectos y vista detallada de actividades
+- **Diseño responsive**: Se adapta a diferentes tamaños de pantalla
 
 ## Tecnologías Utilizadas
 
-- **React 18** con Vite
+- **React 19** con Vite
 - **Bootstrap 5** y React-Bootstrap
-- **Chart.js** para visualizaciones
+- **Recharts** para visualizaciones
 - **SheetJS (xlsx)** para procesamiento de archivos Excel
+- **date-fns** para manejo de fechas
 - **Font Awesome** para iconos
 
 ## Instalación
@@ -33,7 +38,7 @@ Dashboard web interactivo para visualizar y analizar indicadores de calidad y re
 1. Clona el repositorio:
 ```bash
 git clone <url-del-repositorio>
-cd TablerosQA
+cd dqa
 ```
 
 2. Instala las dependencias:
@@ -50,23 +55,74 @@ npm run dev
 
 ## Estructura del Archivo Excel
 
-El dashboard espera un archivo Excel con la siguiente estructura de columnas:
+El dashboard espera un archivo Excel con las siguientes 24 columnas:
 
-| Fecha      | Total Pruebas | Aprobadas | Fallidas | Pendientes | Tiempo Promedio (min) |
-|------------|---------------|-----------|----------|------------|-----------------------|
-| 2025-01-01 | 150          | 135       | 10       | 5          | 12.5                  |
-| 2025-01-02 | 180          | 165       | 12       | 3          | 11.8                  |
+### Identificación y Clasificación
+- **Cartera**: Agrupación principal (Banca Digital, Punto de Venta, E-commerce, COE Retail)
+- **Subcartera**: Subagrupación opcional
+- **Proyecto**: Nombre del proyecto
+- **Actividad**: Tipo de actividad (ver catálogo completo en specs/01_Estructura_Excel.md)
+- **Estado**: Terminado, En curso, Por iniciar
+- **Año**: Año de ejecución
 
-### Columnas
+### Esfuerzo y Tiempo
+- **Horas**: Horas invertidas
+- **Dias**: Días hábiles de duración
 
-- **Fecha**: Fecha de ejecución de las pruebas (formato: YYYY-MM-DD)
-- **Total Pruebas**: Número total de pruebas ejecutadas
-- **Aprobadas**: Número de pruebas que pasaron exitosamente
-- **Fallidas**: Número de pruebas que fallaron
-- **Pendientes**: Número de pruebas pendientes de ejecución
-- **Tiempo Promedio (min)**: Tiempo promedio de ejecución en minutos (opcional)
+### Fechas
+- **F.inicio Plan**: Fecha de inicio planificada
+- **F.inicio Real**: Fecha de inicio real
+- **F.Fin Plan**: Fecha de fin planificada
+- **F.Fin Real**: Fecha de fin real
+- **% Efectividad**: Porcentaje de efectividad (0-100)
 
-> **Nota**: El sistema también acepta nombres de columnas en inglés: Date, Passed, Failed, Pending.
+### Casos de Prueba
+- **CP Nuevos**: Casos de prueba nuevos
+- **CP Modificados**: Casos de prueba modificados
+- **CP reutilizados**: Casos de prueba reutilizados
+- **CP Automatizados**: Casos de prueba automatizados
+- **CP Ejecutados**: Casos de prueba ejecutados
+
+### Defectos (Issues)
+- **Issues Bloqueantes**: Defectos bloqueantes
+- **Issues Críticos**: Defectos críticos
+- **Issues Altos**: Defectos de prioridad alta
+- **Issues Menores**: Defectos menores
+- **Total de Issues no resueltos**: Issues pendientes
+
+### Métricas de Corrección
+- **MTTR**: Mean Time To Repair en días hábiles
+
+## KPIs del Dashboard
+
+### 1. Casos de Prueba (6 KPIs)
+- CP Diseñados
+- CP Nuevos
+- CP Modificados
+- CP Reutilizados
+- CP Automatizados
+- CP Ejecutados
+
+### 2. Defectos (9 KPIs)
+- Total Issues Shift Left
+- Total Issues Ejecución
+- Total Issues
+- Issues No Resueltos
+- Issues por Severidad - Shift Left
+- Issues por Severidad - Ejecución
+- Escape Rate UAT
+- Escape Rate Productivo
+- MTTR Promedio
+
+### 3. Efectividad (4 KPIs)
+- % Efectividad Ciclo 1
+- % Efectividad Ciclos QA
+- % Efectividad UAT
+- % Efectividad Ejecución
+
+### 4. Desviaciones (2 KPIs)
+- Horas Desviación Total
+- Horas Desviación por Proyecto
 
 ## Uso
 
@@ -74,32 +130,57 @@ El dashboard espera un archivo Excel con la siguiente estructura de columnas:
    - Haz clic en el área de carga o arrastra tu archivo Excel
    - El sistema procesará automáticamente el archivo
 
-2. **Ver métricas**:
-   - Las tarjetas superiores muestran totales acumulados
-   - La tasa de éxito se calcula automáticamente
+2. **Aplicar filtros**:
+   - Selecciona Año, Cartera, Subcartera, Proyecto o Estado
+   - Los filtros se aplican en tiempo real
 
-3. **Analizar gráficos**:
-   - Gráfico de líneas: Muestra tendencias a lo largo del tiempo
-   - Gráfico de dona: Visualiza la distribución porcentual de resultados
+3. **Ver métricas**:
+   - Las tarjetas muestran los totales acumulados
+   - Los gauges muestran porcentajes con semáforos
+   - Los gráficos muestran tendencias mensuales
 
-4. **Revisar detalles**:
-   - La tabla inferior muestra todos los registros con su estado
+4. **Analizar tendencias**:
+   - Usa las pestañas para ver evolución de Casos de Prueba, Defectos o Efectividad
 
-## Indicadores del Dashboard
+5. **Visualizar cronograma**:
+   - Expande la sección Gantt
+   - Vista general muestra todos los proyectos
+   - Haz clic en un proyecto para ver sus actividades en detalle
 
-### Métricas Principales
+## Secciones del Dashboard
 
-- **Total de Pruebas**: Suma de todas las pruebas ejecutadas
-- **Pruebas Aprobadas**: Total de pruebas exitosas
-- **Pruebas Fallidas**: Total de pruebas con fallos
-- **Tasa de Éxito**: Porcentaje de pruebas aprobadas
+### SECCIÓN 1: Casos de Prueba
+Grid de 6 KPIs mostrando métricas de diseño, ejecución y automatización.
 
-### Métricas Secundarias
+### SECCIÓN 2: Defectos
+- 3 KPIs principales (Shift Left, Ejecución, Total)
+- 2 Gauges (Escape Rates)
+- MTTR con semáforo
+- Issues no resueltos
+- 2 gráficos de área apilada por severidad
 
-- **Pruebas Pendientes**: Total de pruebas sin completar
-- **Tiempo Promedio**: Tiempo promedio de ejecución por prueba
-- **Días Analizados**: Cantidad de días con datos
-- **Promedio Diario**: Cantidad promedio de pruebas por día
+### SECCIÓN 3: Efectividad
+4 KPIs con semáforos (🟢🟡🔴) y gráfico de tendencias con línea de meta al 90%.
+
+### SECCIÓN 4: Desviaciones
+Total de horas y gráfico de barras horizontal por proyecto (Top 10).
+
+### SECCIÓN 5: Tendencias Mensuales
+3 pestañas con gráficos de evolución mensual:
+- Casos de Prueba: 6 líneas
+- Defectos: Área apilada + MTTR
+- Efectividad: 4 líneas + meta
+
+### SECCIÓN 6: Gantt (Collapsible)
+**Vista General** (sin proyecto seleccionado):
+- Cada fila = 1 proyecto
+- Fechas: MIN/MAX de todas sus actividades
+- Click en proyecto → cambia a Vista Detallada
+
+**Vista Detallada** (proyecto seleccionado):
+- Cada fila = 1 actividad
+- Fechas: F.inicio Real / F.Fin Real
+- Muestra CP ejecutados, Issues y Horas
 
 ## Scripts Disponibles
 
@@ -120,71 +201,86 @@ npm run lint
 ## Estructura del Proyecto
 
 ```
-TablerosQA/
+dqa/
+├── specs/                          # Especificaciones técnicas
+│   ├── 00_README.md
+│   ├── 01_Estructura_Excel.md
+│   ├── 02_Campos_Calculados.md
+│   ├── 03_KPIs_Definiciones.md
+│   ├── 04_KPIs_Visualizacion.md
+│   ├── 05_Mapeo_Campos_Formulas.md
+│   └── 06_Especificaciones_Dashboard.md
 ├── src/
 │   ├── components/
-│   │   ├── Dashboard.jsx          # Componente principal
-│   │   ├── ExcelUploader.jsx      # Componente de carga
-│   │   ├── MetricCard.jsx         # Tarjetas de métricas
-│   │   ├── TestTrendsChart.jsx    # Gráfico de tendencias
-│   │   └── TestDistributionChart.jsx  # Gráfico de distribución
+│   │   └── qa-dashboard/
+│   │       ├── QADashboard.jsx           # Componente principal
+│   │       ├── ExcelUploaderQA.jsx       # Cargador de Excel
+│   │       ├── QAFilters.jsx             # Filtros globales
+│   │       ├── KPICard.jsx               # Tarjeta de KPI
+│   │       ├── GaugeChart.jsx            # Gráfico gauge
+│   │       ├── CasosPruebaSection.jsx    # Sección 1
+│   │       ├── DefectosSection.jsx       # Sección 2
+│   │       ├── EfectividadSection.jsx    # Sección 3
+│   │       ├── DesviacionesSection.jsx   # Sección 4
+│   │       ├── TendenciasSection.jsx     # Sección 5
+│   │       └── GanttSection.jsx          # Sección 6
 │   ├── utils/
-│   │   └── excelProcessor.js      # Procesamiento de Excel
+│   │   └── qaExcelProcessor.js           # Procesamiento y cálculo de KPIs
 │   ├── styles/
-│   │   └── dashboard.css          # Estilos personalizados
-│   ├── data/
-│   │   └── ejemplo-datos-testing.json  # Datos de ejemplo
+│   │   ├── dashboard.css
+│   │   └── qa-dashboard.css
 │   ├── App.jsx
-│   ├── main.jsx
-│   └── index.css
+│   └── main.jsx
 ├── package.json
 └── README.md
 ```
 
-## Personalización
+## Reglas de Negocio Importantes
 
-### Cambiar colores
+### Issues Shift Left vs Ejecución
+- **Shift Left**: Issues encontrados en "Analisis y Dimensionamiento" y "Diseño de escenarios"
+- **Ejecución**: Issues encontrados en todos los ciclos QA, UAT, Preproductivas, Smoke y Estabilización
 
-Edita las variables CSS en `src/styles/dashboard.css`:
+### Estado del Proyecto
+- **Concluido**: TODAS las actividades del proyecto tienen Estado = "Terminado"
+- **En Curso**: AL MENOS UNA actividad del proyecto tiene Estado ≠ "Terminado"
 
-```css
-:root {
-  --primary-color: #007bff;
-  --success-color: #28a745;
-  --danger-color: #dc3545;
-  --warning-color: #ffc107;
-  --info-color: #17a2b8;
-}
-```
+### Escape Rates
+- **Escape Rate UAT**: Numerador = Issues en UAT, Denominador = Issues en Ciclos QA solamente
+- **Escape Rate Productivo**: Filtro = "Estabilización Productiva", Denominador = Total Issues en Ejecución
 
-### Agregar nuevos indicadores
+### Semáforos de Efectividad
+- 🟢 Verde: ≥ 90%
+- 🟡 Amarillo: 70% - 89%
+- 🔴 Rojo: < 70%
 
-1. Actualiza `calculateTestingMetrics()` en `src/utils/excelProcessor.js`
-2. Agrega nuevas `MetricCard` en `src/components/Dashboard.jsx`
+## Documentación Técnica
 
-### Crear nuevos gráficos
+Para más detalles sobre la implementación, consulta la carpeta `/specs`:
 
-1. Crea un nuevo componente en `src/components/`
-2. Importa y usa en `Dashboard.jsx`
+- **01_Estructura_Excel.md**: Definición de las 24 columnas
+- **02_Campos_Calculados.md**: Campos derivados
+- **03_KPIs_Definiciones.md**: Fórmulas detalladas de los 21 KPIs
+- **04_KPIs_Visualizacion.md**: Especificaciones de visualización
+- **05_Mapeo_Campos_Formulas.md**: Relación columnas → KPIs
+- **06_Especificaciones_Dashboard.md**: Layout y UX completo
 
 ## Solución de Problemas
 
 ### El archivo no se carga
+- Verifica que sea un archivo Excel válido (.xlsx, .xls, .ods)
+- Asegúrate de que tenga las 24 columnas requeridas
+- Revisa que los nombres de columnas sean exactos
 
-- Verifica que sea un archivo Excel válido (.xlsx, .xls)
-- Asegúrate de que tenga al menos las columnas básicas
-
-### Los datos no se muestran correctamente
-
-- Revisa que los nombres de las columnas coincidan con los esperados
-- Verifica que los valores numéricos no tengan formato de texto
+### Los KPIs muestran 0
+- Verifica que la columna "Actividad" tenga valores exactos del catálogo
+- Revisa que las fechas estén en formato válido
+- Asegúrate de que los filtros no estén excluyendo todos los datos
 
 ### Error al instalar dependencias
-
 ```bash
-# Limpia node_modules e instala de nuevo
 rm -rf node_modules package-lock.json
-npm install
+npm install --legacy-peer-deps
 ```
 
 ## Contribuir
@@ -207,4 +303,6 @@ Para preguntas o sugerencias, por favor abre un issue en el repositorio.
 
 ---
 
-Desarrollado con React + Vite
+**Última actualización:** Octubre 2025
+**Versión:** 2.0
+Desarrollado con React + Vite + Recharts
