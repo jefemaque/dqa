@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard QA - Métricas de Calidad</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #f5f5f5;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        .dashboard-header {
+            background: white;
+            border-bottom: 3px solid #3b82f6;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .kpi-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .kpi-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0.5rem 0;
+        }
+
+        .kpi-title {
+            color: #6b7280;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .kpi-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .section-title {
+            margin: 2rem 0 1.5rem 0;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+        }
+
+        .upload-area {
+            border: 2px dashed #cbd5e1;
+            border-radius: 8px;
+            padding: 3rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .upload-area:hover {
+            border-color: #3b82f6;
+            background-color: #f0f7ff;
+        }
+
+        .upload-area.dragover {
+            border-color: #3b82f6;
+            background-color: #f0f7ff;
+        }
+
+        .badge-semaforo {
+            padding: 0.375rem 0.75rem;
+            border-radius: 4px;
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+
+        .filters-panel {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+        }
+
+        .filter-label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #374151;
+        }
+
+        canvas {
+            max-height: 400px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .gantt-section {
+            margin-top: 2rem;
+        }
+
+        .gantt-collapsed {
+            display: none;
+        }
+
+        .gantt-row {
+            padding: 0.75rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .gantt-bar {
+            background: #3b82f6;
+            height: 24px;
+            border-radius: 4px;
+            display: inline-block;
+            min-width: 2%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .gantt-bar:hover {
+            opacity: 0.8;
+            transform: scale(1.02);
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="dashboard-header py-4">
+        <div class="container">
+            <h1 class="mb-2">
+                <i class="fas fa-chart-line me-3 text-primary"></i>
+                Dashboard QA - Métricas de Calidad
+            </h1>
+            <p class="text-muted mb-0">Monitor y análisis de resultados de pruebas de software</p>
+        </div>
+    </div>
+
+    <div class="container my-4">
+        <!-- Upload Area -->
+        <div id="uploadSection">
+            <div class="upload-area" id="uploadArea">
+                <input type="file" id="fileInput" accept=".xlsx,.xls,.ods" style="display: none;">
+                <i class="fas fa-file-excel fa-3x text-success mb-3"></i>
+                <h5>Cargar Archivo Excel</h5>
+                <p class="text-muted mb-0">Arrastra y suelta tu archivo aquí o haz clic para seleccionar</p>
+                <small class="text-muted">Formatos soportados: .xlsx, .xls, .ods</small>
+            </div>
+        </div>
+
+        <!-- Filters Panel -->
+        <div id="filtersPanel" class="filters-panel hidden">
+            <h5 class="mb-3">
+                <i class="fas fa-filter me-2"></i>
+                Filtros Globales
+            </h5>
+            <div class="row g-3">
+                <div class="col-md-2">
+                    <label class="filter-label">Año</label>
+                    <select class="form-select form-select-sm" id="filterAnio">
+                        <option value="">Todos</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="filter-label">Cartera</label>
+                    <select class="form-select form-select-sm" id="filterCartera">
+                        <option value="">Todas</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="filter-label">Proyecto</label>
+                    <select class="form-select form-select-sm" id="filterProyecto" multiple size="3">
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="filter-label">Estado</label>
+                    <div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="estadoTerminado" checked>
+                            <label class="form-check-label" for="estadoTerminado">Terminado</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="estadoEnCurso" checked>
+                            <label class="form-check-label" for="estadoEnCurso">En curso</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="estadoPorIniciar" checked>
+                            <label class="form-check-label" for="estadoPorIniciar">Por iniciar</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button class="btn btn-sm btn-outline-secondary" id="btnResetFilters">
+                        <i class="fas fa-redo me-1"></i>
+                        Limpiar Filtros
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Content -->
+        <div id="dashboardContent" class="hidden">
+            <!-- Sección 1: Casos de Prueba -->
+            <h3 class="section-title">
+                <i class="fas fa-clipboard-check me-2 text-primary"></i>
+                Casos de Prueba
+            </h3>
+            <div class="row g-3 mb-4" id="casosPruebaKPIs">
+                <!-- KPIs se generan dinámicamente -->
+            </div>
+
+            <!-- Sección 2: Defectos -->
+            <h3 class="section-title">
+                <i class="fas fa-bug me-2 text-danger"></i>
+                Defectos (Issues)
+            </h3>
+            <div class="row g-3 mb-4" id="defectosKPIs">
+                <!-- KPIs se generan dinámicamente -->
+            </div>
+            <div class="row g-3 mb-4">
+                <div class="col-md-12">
+                    <div class="chart-container">
+                        <h5 class="mb-3">
+                            <i class="fas fa-chart-area me-2"></i>
+                            Issues por Severidad - Evolución Mensual
+                        </h5>
+                        <canvas id="issuesSeveridadChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección 3: Efectividad -->
+            <h3 class="section-title">
+                <i class="fas fa-trophy me-2 text-warning"></i>
+                Efectividad
+            </h3>
+            <div class="row g-3 mb-4" id="efectividadKPIs">
+                <!-- KPIs se generan dinámicamente -->
+            </div>
+            <div class="chart-container">
+                <h5 class="mb-3">
+                    <i class="fas fa-chart-line me-2"></i>
+                    Tendencia de Efectividad Mensual
+                </h5>
+                <canvas id="efectividadChart"></canvas>
+            </div>
+
+            <!-- Sección 4: Desviaciones -->
+            <h3 class="section-title">
+                <i class="fas fa-exclamation-triangle me-2 text-danger"></i>
+                Desviaciones
+            </h3>
+            <div class="row g-3 mb-4" id="desviacionesKPIs">
+                <!-- KPIs se generan dinámicamente -->
+            </div>
+            <div class="chart-container">
+                <h5 class="mb-3">
+                    <i class="fas fa-chart-bar me-2"></i>
+                    Horas de Desviación por Proyecto (Top 10)
+                </h5>
+                <canvas id="desviacionesChart"></canvas>
+            </div>
+
+            <!-- Sección 5: Tendencias -->
+            <h3 class="section-title">
+                <i class="fas fa-chart-area me-2 text-info"></i>
+                Tendencias Mensuales
+            </h3>
+            <div class="chart-container">
+                <ul class="nav nav-tabs mb-3" role="tablist">
+                    <li class="nav-item">
+                        <button class="nav-link active" data-tab="casos" onclick="cambiarTab('casos')">
+                            <i class="fas fa-clipboard-check me-2"></i>Casos de Prueba
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" data-tab="defectos" onclick="cambiarTab('defectos')">
+                            <i class="fas fa-bug me-2"></i>Defectos
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" data-tab="efectividad" onclick="cambiarTab('efectividad')">
+                            <i class="fas fa-trophy me-2"></i>Efectividad
+                        </button>
+                    </li>
+                </ul>
+                <div id="tabCasos" class="tab-content active">
+                    <canvas id="casosPruebaChart"></canvas>
+                </div>
+                <div id="tabDefectos" class="tab-content">
+                    <canvas id="defectosChart"></canvas>
+                </div>
+                <div id="tabEfectividad" class="tab-content">
+                    <canvas id="efectividadTendenciaChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SheetJS (xlsx) -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+
+    <!-- Bootstrap Bundle (includes Popper) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Main Application Script -->
+    <script src="dashboard.js"></script>
+</body>
+</html>
