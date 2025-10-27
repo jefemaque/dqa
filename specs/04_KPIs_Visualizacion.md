@@ -1,6 +1,7 @@
 # 04 - KPIs: Especificaciones de Visualización
 
-**Última actualización:** 26 de octubre, 2025
+**Última actualización:** 27 de octubre, 2025  
+**Versión:** 2.1
 
 ---
 
@@ -11,6 +12,10 @@ Este documento especifica **cómo visualizar** cada uno de los 21 KPIs del Dashb
 - Tipo de gráfico (line, area, bar, gauge, etc.)
 - Colores y formato
 - Semáforos y umbrales
+- **✨ v2.1: Formato de meses en español (ENE, FEB, MAR...)**
+- **✨ v2.1: Formato CP sin decimales con coma (1,250)**
+- **✨ v2.1: Tendencias mensuales para TODOS los CP**
+- **✨ v2.1: Composición de Desviaciones (Donut Chart)**
 
 ---
 
@@ -39,28 +44,85 @@ Este documento especifica **cómo visualizar** cada uno de los 21 KPIs del Dashb
 --color-critico: #ef4444     /* Rojo */
 --color-alto: #f59e0b        /* Naranja */
 --color-menor: #a3e635       /* Verde lima */
+
+/* Colores para Composición de Desviaciones */
+--color-desv-1: #dc2626     /* Rojo oscuro */
+--color-desv-2: #ef4444     /* Rojo */
+--color-desv-3: #f59e0b     /* Naranja */
+--color-desv-4: #fb923c     /* Naranja claro */
+--color-desv-5: #fca5a5     /* Rosa claro */
+```
+
+---
+
+## 📅 FORMATO DE EJE X (MESES) - v2.1 ✨
+
+**ESTÁNDAR PARA TODOS LOS GRÁFICOS DE TENDENCIA MENSUAL:**
+
+### Especificaciones
+- **Formato:** Primeras 3 letras del mes en MAYÚSCULAS
+- **Idioma:** Español
+- **Meses:** ENE, FEB, MAR, ABR, MAY, JUN, JUL, AGO, SEP, OCT, NOV, DIC
+- **Comportamiento:** Mostrar TODOS los 12 meses del año, aunque no haya datos
+- **Meses sin datos:** Mostrar valor en 0 o punto vacío en el gráfico
+
+### Ejemplo de Eje X
+```
+ENE  FEB  MAR  ABR  MAY  JUN  JUL  AGO  SEP  OCT  NOV  DIC
+```
+
+### Implementación JavaScript
+```javascript
+// Constante de meses en español
+const MESES_ES = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 
+                  'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC'];
+
+// Función para generar datos mensuales completos
+function generarDatosMensuales(datos, año) {
+  const datosPorMes = {};
+  
+  // Agrupar datos por mes
+  datos.forEach(row => {
+    if (row['F.Fin Real']) {
+      const fecha = new Date(row['F.Fin Real']);
+      if (fecha.getFullYear() === año) {
+        const mes = fecha.getMonth(); // 0-11
+        const mesNombre = MESES_ES[mes];
+        datosPorMes[mesNombre] = (datosPorMes[mesNombre] || 0) + (row.valor || 0);
+      }
+    }
+  });
+  
+  // Crear array con todos los 12 meses
+  return MESES_ES.map(mes => ({
+    mes: mes,
+    valor: datosPorMes[mes] || 0
+  }));
+}
 ```
 
 ---
 
 ## 📋 CATEGORÍA 1: CASOS DE PRUEBA (6 KPIs)
 
-### **KPI 1: CP Diseñados**
+### **KPI 1: CP Diseñados** ✨ v2.1 ACTUALIZADO
 
 **Visualización Principal:**
 - **Tipo:** KPI Card (totalizado)
 - **Valor:** Número entero con separador de miles
-- **Formato:** `1,250 CP`
+- **Formato:** `1,250 CP` (sin decimales, coma como separador de miles)
 - **Color:** Verde (`#10b981`)
 - **Icono:** 📝 o `<FileText />`
 
-**Visualización Secundaria:**
+**Visualización Secundaria:** ✨ NUEVO en v2.1
 - **Tipo:** Gráfico de línea (tendencia mensual)
-- **Eje X:** Meses (formato: "Ene 2025", "Feb 2025", etc.)
-- **Eje Y:** Cantidad de CP
+- **Eje X:** Meses del año (formato: "ENE", "FEB", "MAR", ..., "DIC")
+  - Mostrar TODOS los 12 meses del año aunque no haya datos
+  - Si no hay datos en un mes, mostrar valor en 0 o punto vacío
+- **Eje Y:** Cantidad de CP (sin decimales, con coma como separador de miles)
 - **Color línea:** Verde (`#10b981`)
-- **Puntos:** Círculos rellenos
-- **Tooltip:** `Mes: {mes}<br>CP Diseñados: {valor}`
+- **Puntos:** Círculos rellenos solo en meses con datos
+- **Tooltip:** `{mes}<br>CP Diseñados: {valor:,}`
 
 **Ubicación en Dashboard:**
 - Sección: Casos de Prueba
@@ -68,83 +130,94 @@ Este documento especifica **cómo visualizar** cada uno de los 21 KPIs del Dashb
 
 ---
 
-### **KPI 2: CP Nuevos**
+### **KPI 2: CP Nuevos** ✨ v2.1 ACTUALIZADO
 
 **Visualización Principal:**
 - **Tipo:** KPI Card (totalizado)
-- **Valor:** Número entero
-- **Formato:** `350 CP`
+- **Valor:** Número entero con separador de miles
+- **Formato:** `350 CP` (sin decimales, coma como separador)
 - **Color:** Azul (`#3b82f6`)
 - **Icono:** ✨ o `<Plus />`
 
-**Visualización Secundaria:**
+**Visualización Secundaria:** ✨ NUEVO en v2.1
 - **Tipo:** Gráfico de línea (tendencia mensual)
+- **Eje X:** Formato estándar de meses (ENE, FEB, MAR, ...)
+- **Eje Y:** Cantidad de CP (sin decimales, con coma)
 - **Color línea:** Azul (`#3b82f6`)
+- **Tooltip:** `{mes}<br>CP Nuevos: {valor:,}`
 
 **Ubicación:** Casos de Prueba - Segunda tarjeta
 
 ---
 
-### **KPI 3: CP Modificados**
+### **KPI 3: CP Modificados** ✨ v2.1 ACTUALIZADO
 
 **Visualización Principal:**
 - **Tipo:** KPI Card (totalizado)
-- **Formato:** `180 CP`
+- **Formato:** `180 CP` (sin decimales, coma como separador)
 - **Color:** Cyan (`#06b6d4`)
 - **Icono:** 🔄 o `<Edit />`
 
-**Visualización Secundaria:**
+**Visualización Secundaria:** ✨ NUEVO en v2.1
 - **Tipo:** Gráfico de línea (tendencia mensual)
+- **Eje X:** Formato estándar de meses (ENE, FEB, MAR, ...)
 - **Color línea:** Cyan (`#06b6d4`)
+- **Tooltip:** `{mes}<br>CP Modificados: {valor:,}`
 
 **Ubicación:** Casos de Prueba - Tercera tarjeta
 
 ---
 
-### **KPI 4: CP Reutilizados**
+### **KPI 4: CP Reutilizados** ✨ v2.1 ACTUALIZADO
 
 **Visualización Principal:**
 - **Tipo:** KPI Card (totalizado)
-- **Formato:** `720 CP`
+- **Formato:** `720 CP` (sin decimales, coma como separador)
 - **Color:** Gris (`#6b7280`)
 - **Icono:** ♻️ o `<Repeat />`
 - **Nota:** KPI independiente, NO se suma en CP Diseñados
 
-**Visualización Secundaria:**
+**Visualización Secundaria:** ✨ NUEVO en v2.1
 - **Tipo:** Gráfico de línea (tendencia mensual)
+- **Eje X:** Formato estándar de meses (ENE, FEB, MAR, ...)
 - **Color línea:** Gris (`#6b7280`)
+- **Tooltip:** `{mes}<br>CP Reutilizados: {valor:,}`
 
 **Ubicación:** Casos de Prueba - Cuarta tarjeta
 
 ---
 
-### **KPI 5: CP Automatizados**
+### **KPI 5: CP Automatizados** ✨ v2.1 ACTUALIZADO
 
 **Visualización Principal:**
 - **Tipo:** KPI Card (totalizado)
-- **Formato:** `450 CP`
+- **Formato:** `450 CP` (sin decimales, coma como separador)
 - **Color:** Púrpura (`#8b5cf6`)
 - **Icono:** 🤖 o `<Zap />`
 
-**Visualización Secundaria:**
+**Visualización Secundaria:** ✨ NUEVO en v2.1
 - **Tipo:** Gráfico de línea (tendencia mensual)
+- **Eje X:** Formato estándar de meses (ENE, FEB, MAR, ...)
 - **Color línea:** Púrpura (`#8b5cf6`)
+- **Tooltip:** `{mes}<br>CP Automatizados: {valor:,}`
 
 **Ubicación:** Casos de Prueba - Quinta tarjeta
 
 ---
 
-### **KPI 6: CP Ejecutados**
+### **KPI 6: CP Ejecutados** ✨ v2.1 ACTUALIZADO
 
 **Visualización Principal:**
 - **Tipo:** KPI Card (totalizado)
-- **Formato:** `1,100 CP`
+- **Formato:** `1,100 CP` (sin decimales, coma como separador)
 - **Color:** Azul oscuro (`#1e40af`)
 - **Icono:** ✅ o `<CheckCircle />`
 
-**Visualización Secundaria:**
+**Visualización Secundaria:** ✨ NUEVO en v2.1
 - **Tipo:** Gráfico de línea (tendencia mensual)
+- **Eje X:** Formato estándar de meses (ENE, FEB, MAR, ...)
 - **Color línea:** Azul oscuro (`#1e40af`)
+- **Tooltip:** `{mes}<br>CP Ejecutados: {valor:,}`
 
 **Ubicación:** Casos de Prueba - Sexta tarjeta
 
@@ -163,6 +236,7 @@ Este documento especifica **cómo visualizar** cada uno de los 21 KPIs del Dashb
 
 **Visualización Secundaria:**
 - **Tipo:** Gráfico de línea (tendencia mensual)
+- **Eje X:** Formato estándar de meses (ENE, FEB, MAR, ...)
 - **Color línea:** Morado (`#9333ea`)
 
 **Ubicación:** Defectos - Primera tarjeta
@@ -180,6 +254,7 @@ Este documento especifica **cómo visualizar** cada uno de los 21 KPIs del Dashb
 
 **Visualización Secundaria:**
 - **Tipo:** Gráfico de línea (tendencia mensual)
+- **Eje X:** Formato estándar de meses (ENE, FEB, MAR, ...)
 - **Color línea:** Rojo (`#ef4444`)
 
 **Ubicación:** Defectos - Segunda tarjeta
@@ -198,6 +273,7 @@ Este documento especifica **cómo visualizar** cada uno de los 21 KPIs del Dashb
 
 **Visualización Secundaria:**
 - **Tipo:** Gráfico de área apilada (2 series)
+- **Eje X:** Formato estándar de meses (ENE, FEB, MAR, ...)
 - **Series:**
   - Shift Left: Morado (`#9333ea`)
   - Ejecución: Rojo (`#ef4444`)
@@ -223,14 +299,14 @@ Este documento especifica **cómo visualizar** cada uno de los 21 KPIs del Dashb
 
 **Visualización Secundaria:**
 - **Tipo:** Gráfico de línea con bandas de semáforo (tendencia mensual)
-- **Eje X:** Meses
+- **Eje X:** Formato estándar de meses (ENE, FEB, MAR, ...)
 - **Eje Y:** Porcentaje (0-100%)
 - **Línea:** Color según semáforo del mes
 - **Bandas de fondo:**
   - Verde: 0-5%
   - Amarillo: 5-10%
   - Rojo: 10-100%
-- **Tooltip:** `Mes: {mes}<br>Escape Rate: {valor}%<br>Estado: {semáforo_emoji}`
+- **Tooltip:** `{mes}<br>Escape Rate: {valor}%<br>Estado: {semáforo_emoji}`
 
 **Ubicación:** Defectos - Tarjeta destacada con gauge
 
@@ -251,6 +327,7 @@ Este documento especifica **cómo visualizar** cada uno de los 21 KPIs del Dashb
 
 **Visualización Secundaria:**
 - **Tipo:** Gráfico de línea con bandas de semáforo
+- **Eje X:** Formato estándar de meses (ENE, FEB, MAR, ...)
 - **Bandas de fondo:**
   - Verde: 0-2%
   - Amarillo: 2-5%
@@ -275,11 +352,11 @@ Este documento especifica **cómo visualizar** cada uno de los 21 KPIs del Dashb
 
 **Visualización Secundaria:**
 - **Tipo:** Gráfico combinado (barras + línea de meta)
-- **Eje X:** Meses
+- **Eje X:** Formato estándar de meses (ENE, FEB, MAR, ...)
 - **Eje Y:** Días (0-10)
 - **Barras:** Color según semáforo del mes
 - **Línea horizontal:** Meta de 3 días (línea punteada verde)
-- **Tooltip:** `Mes: {mes}<br>MTTR: {valor} días<br>Estado: {semáforo}`
+- **Tooltip:** `{mes}<br>MTTR: {valor} días<br>Estado: {semáforo}`
 
 **Ubicación:** Defectos - Cuarta tarjeta
 
@@ -289,7 +366,7 @@ Este documento especifica **cómo visualizar** cada uno de los 21 KPIs del Dashb
 
 **Visualización Principal:**
 - **Tipo:** Gráfico de área apilada (Stacked Area Chart)
-- **Eje X:** Meses
+- **Eje X:** Formato estándar de meses (ENE, FEB, MAR, ...)
 - **Eje Y:** Cantidad de Issues
 - **Series (de abajo hacia arriba):**
   1. **Menores** - Color: `#a3e635` (Verde lima)
@@ -298,7 +375,7 @@ Este documento especifica **cómo visualizar** cada uno de los 21 KPIs del Dashb
   4. **Bloqueantes** - Color: `#991b1b` (Rojo oscuro)
 - **Tooltip:** 
   ```
-  Mes: {mes}
+  {mes}
   Shift Left:
   ├─ Bloqueantes: {valor}
   ├─ Críticos: {valor}
@@ -316,10 +393,11 @@ Este documento especifica **cómo visualizar** cada uno de los 21 KPIs del Dashb
 
 **Visualización Principal:**
 - **Tipo:** Gráfico de área apilada (Stacked Area Chart)
+- **Eje X:** Formato estándar de meses (ENE, FEB, MAR, ...)
 - **Series:** Misma configuración que KPI 13
 - **Tooltip:** 
   ```
-  Mes: {mes}
+  {mes}
   Ejecución:
   ├─ Bloqueantes: {valor}
   ├─ Críticos: {valor}
@@ -343,6 +421,7 @@ Este documento especifica **cómo visualizar** cada uno de los 21 KPIs del Dashb
 
 **Visualización Secundaria:**
 - **Tipo:** Gráfico de línea + área (tendencia mensual)
+- **Eje X:** Formato estándar de meses (ENE, FEB, MAR, ...)
 - **Color línea:** Rojo oscuro (`#dc2626`)
 - **Color área:** Rojo claro con transparencia (`rgba(220, 38, 38, 0.1)`)
 
@@ -369,6 +448,7 @@ Este documento especifica **cómo visualizar** cada uno de los 21 KPIs del Dashb
 
 **Visualización Secundaria:**
 - **Tipo:** Gráfico de línea con meta
+- **Eje X:** Formato estándar de meses (ENE, FEB, MAR, ...)
 - **Línea horizontal:** Meta 90% (línea punteada verde)
 - **Color línea:** Naranja con gradiente
 
@@ -387,6 +467,7 @@ Este documento especifica **cómo visualizar** cada uno de los 21 KPIs del Dashb
 
 **Visualización Secundaria:**
 - **Tipo:** Gráfico de línea
+- **Eje X:** Formato estándar de meses (ENE, FEB, MAR, ...)
 - **Color:** Azul (`#3b82f6`)
 
 **Ubicación:** Efectividad - Segunda tarjeta
@@ -404,6 +485,7 @@ Este documento especifica **cómo visualizar** cada uno de los 21 KPIs del Dashb
 
 **Visualización Secundaria:**
 - **Tipo:** Gráfico de línea
+- **Eje X:** Formato estándar de meses (ENE, FEB, MAR, ...)
 - **Color:** Púrpura (`#8b5cf6`)
 
 **Ubicación:** Efectividad - Tercera tarjeta
@@ -423,6 +505,7 @@ Este documento especifica **cómo visualizar** cada uno de los 21 KPIs del Dashb
 
 **Visualización Secundaria:**
 - **Tipo:** Gráfico de línea
+- **Eje X:** Formato estándar de meses (ENE, FEB, MAR, ...)
 - **Color:** Verde (`#10b981`)
 
 **Ubicación:** Efectividad - Cuarta tarjeta
@@ -441,32 +524,56 @@ Este documento especifica **cómo visualizar** cada uno de los 21 KPIs del Dashb
 
 **Visualización Secundaria:**
 - **Tipo:** Gráfico de barras (tendencia mensual)
+- **Eje X:** Formato estándar de meses (ENE, FEB, MAR, ...)
 - **Color barras:** Rojo con gradiente
-- **Tooltip:** `Mes: {mes}<br>Desviación: {valor} hrs`
+- **Tooltip:** `{mes}<br>Desviación: {valor} hrs`
 
 **Ubicación:** Desviaciones - Primera tarjeta
 
 ---
 
-### **KPI 21: Horas de Desviación por Proyecto**
+### **KPI 21: Composición de Desviaciones** ✨ v2.1 NUEVO
+
+**Definición:**  
+Distribución de horas de desviación por tipo de retraso, mostrando la composición de las causas de desviación.
 
 **Visualización Principal:**
-- **Tipo:** Bar Chart horizontal (TOP proyectos)
-- **Eje X:** Horas
-- **Eje Y:** Nombre del Proyecto
-- **Color:** Rojo con gradiente (más oscuro = más horas)
-- **Formato:** `X,XXX hrs` por proyecto
-- **Límite:** Top 10 proyectos con más desviación
-- **Orden:** Descendente (mayor a menor)
+- **Tipo:** Donut Chart (gráfico de dona)
+- **Datos:** 5 tipos de retraso con sus horas acumuladas
+- **Colores:** Gradiente de rojos/naranjas
+  - Retraso por definiciones Incompletas o Ambigüas: `#dc2626`
+  - Retraso por entrega tardía de desarrollo: `#ef4444`
+  - Retraso por indisponibilidad de ambientes: `#f59e0b`
+  - Retraso por cambios en el alcance: `#fb923c`
+  - Retraso por ineficiencias con el equipo: `#fca5a5`
+- **Centro del Donut:** Total de horas de desviación
+- **Leyenda:** A la derecha con porcentajes
 
 **Tooltip:**
 ```
-Proyecto: {nombre}
-Horas Desviación: {valor} hrs
+{tipo_retraso}
+Horas: {valor} hrs
 % del Total: {porcentaje}%
 ```
 
-**Ubicación:** Desviaciones - Gráfico ancho completo
+**Visualización Alternativa (Tabla):**
+- Tabla ordenada descendente por horas
+- Columnas: Tipo de Retraso | Horas | % del Total | Barra visual
+
+**Ejemplo:**
+```
+Tipo de Retraso                          │ Horas │  %   │ Gráfico
+─────────────────────────────────────────┼───────┼──────┼─────────────
+Entrega tardía de desarrollo             │  65   │ 36%  │ ████████████
+Definiciones incompletas o ambiguas      │  45   │ 25%  │ ████████
+Cambios en el alcance                    │  35   │ 19%  │ ██████
+Indisponibilidad de ambientes            │  25   │ 14%  │ ████
+Ineficiencias con el equipo              │  10   │  6%  │ ██
+─────────────────────────────────────────┼───────┼──────┼─────────────
+TOTAL                                    │ 180   │ 100% │
+```
+
+**Ubicación:** Desviaciones - Gráfico/tabla ancho completo
 
 ---
 
@@ -480,7 +587,7 @@ Horas Desviación: {valor} hrs
     <div>
       <p className="text-sm text-gray-500 mb-1">{título}</p>
       <p className="text-3xl font-bold" style={{color: colorKPI}}>
-        {valor}
+        {valor.toLocaleString('es-ES')} {/* Formato con comas */}
       </p>
       {badge && (
         <Badge variant={badgeVariant} className="mt-2">
@@ -503,35 +610,18 @@ Horas Desviación: {valor} hrs
 
 ---
 
-### **Gauge Chart (Semáforo)**
+### **Line Chart (Tendencia Mensual con Meses en Español)**
 
 ```jsx
-<GaugeChart
-  value={valor}
-  min={0}
-  max={100}
-  segments={[
-    { threshold: umbralVerde, color: "#10b981", label: "Bajo" },
-    { threshold: umbralAmarillo, color: "#f59e0b", label: "Medio" },
-    { threshold: 100, color: "#ef4444", label: "Alto" }
-  ]}
-  arcWidth={0.3}
-  needleColor="#374151"
-  needleBaseColor="#6b7280"
-  label={`${valor}%`}
-  labelStyle={{ fontSize: "24px", fontWeight: "bold" }}
-/>
-```
+// Preparar datos con todos los meses del año
+const MESES_ES = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 
+                  'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC'];
 
-**Dimensiones:**
-- Width: 100%
-- Height: 200px
+const dataMensual = MESES_ES.map((mes, index) => ({
+  mes: mes,
+  valor: datosPorMes[mes] || 0 // 0 si no hay datos
+}));
 
----
-
-### **Line Chart (Tendencia Mensual)**
-
-```jsx
 <LineChart data={dataMensual} height={300}>
   <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
   <XAxis 
@@ -542,6 +632,7 @@ Horas Desviación: {valor} hrs
   <YAxis 
     stroke="#6b7280"
     style={{ fontSize: '12px' }}
+    tickFormatter={(value) => value.toLocaleString('es-ES')} // Formato con comas
   />
   <Tooltip 
     contentStyle={{
@@ -550,13 +641,20 @@ Horas Desviación: {valor} hrs
       borderRadius: '8px',
       padding: '12px'
     }}
+    formatter={(value) => value.toLocaleString('es-ES')} // Formato con comas
   />
   <Line 
     type="monotone" 
     dataKey="valor" 
     stroke={color}
     strokeWidth={2}
-    dot={{ r: 4, fill: color }}
+    dot={(props) => {
+      // Solo mostrar punto si hay datos
+      if (props.payload.valor > 0) {
+        return <circle {...props} r={4} fill={color} />;
+      }
+      return null;
+    }}
     activeDot={{ r: 6 }}
   />
 </LineChart>
@@ -564,45 +662,53 @@ Horas Desviación: {valor} hrs
 
 ---
 
-### **Stacked Area Chart (Severidades)**
+### **Donut Chart (Composición de Desviaciones)**
 
 ```jsx
-<AreaChart data={dataMensual} height={400}>
-  <CartesianGrid strokeDasharray="3 3" />
-  <XAxis dataKey="mes" />
-  <YAxis />
-  <Tooltip />
+<PieChart width={400} height={400}>
+  <Pie
+    data={dataDesviaciones}
+    cx="50%"
+    cy="50%"
+    innerRadius={80}
+    outerRadius={120}
+    fill="#8884d8"
+    dataKey="horas"
+    label={({ nombre, porcentaje }) => `${nombre}: ${porcentaje}%`}
+  >
+    {dataDesviaciones.map((entry, index) => (
+      <Cell key={`cell-${index}`} fill={entry.color} />
+    ))}
+  </Pie>
+  <Tooltip 
+    formatter={(value) => `${value.toLocaleString('es-ES')} hrs`}
+  />
   <Legend />
-  <Area 
-    dataKey="menores" 
-    stackId="1" 
-    fill="#a3e635" 
-    stroke="#a3e635"
-    name="Menores"
-  />
-  <Area 
-    dataKey="altos" 
-    stackId="1" 
-    fill="#f59e0b" 
-    stroke="#f59e0b"
-    name="Altos"
-  />
-  <Area 
-    dataKey="criticos" 
-    stackId="1" 
-    fill="#ef4444" 
-    stroke="#ef4444"
-    name="Críticos"
-  />
-  <Area 
-    dataKey="bloqueantes" 
-    stackId="1" 
-    fill="#991b1b" 
-    stroke="#991b1b"
-    name="Bloqueantes"
-  />
-</AreaChart>
+</PieChart>
 ```
+
+---
+
+## 🎨 Reglas de Formato
+
+### **Números:**
+- **Enteros:** Separador de miles con coma (ej: `1,250`)
+  - JavaScript: `valor.toLocaleString('es-ES')`
+- **Decimales:** 1 cifra decimal (ej: `3.3`)
+- **Porcentajes:** 1 decimal + símbolo % (ej: `7.5%`)
+
+### **Meses (NUEVO ESTÁNDAR v2.1):**
+- **Formato:** ENE, FEB, MAR, ABR, MAY, JUN, JUL, AGO, SEP, OCT, NOV, DIC
+- **Idioma:** Español
+- **Case:** MAYÚSCULAS
+- **Mostrar:** TODOS los 12 meses aunque no haya datos
+
+### **Tooltips:**
+- Fondo: Blanco con sombra
+- Border: 1px solid #e5e7eb
+- Padding: 12px
+- Border radius: 8px
+- Fuente: 14px
 
 ---
 
@@ -612,38 +718,13 @@ Horas Desviación: {valor} hrs
 ```
 ┌─────────────┬─────────────┬─────────────┐
 │ CP Diseñados│  CP Nuevos  │CP Modificados│
+│ + Tendencia │ + Tendencia │ + Tendencia  │
 ├─────────────┼─────────────┼─────────────┤
 │CP Reutiliz. │CP Automati. │ CP Ejecut.  │
+│ + Tendencia │ + Tendencia │ + Tendencia  │
 └─────────────┴─────────────┴─────────────┘
 ```
-
-### **Sección 2: Defectos** (Grid mixto)
-```
-┌──────────────┬──────────────┬──────────────┐
-│Issues Shift  │Issues Ejecuc.│Total Issues  │
-│   Left       │              │ (destacado)  │
-├──────────────┼──────────────┼──────────────┤
-│ Escape UAT   │Escape Produc.│    MTTR      │
-│  (gauge)     │   (gauge)    │              │
-├──────────────┼──────────────┼──────────────┤
-│Issues No Res.│              │              │
-├──────────────┴──────────────┴──────────────┤
-│ Issues por Severidad Shift Left (full)     │
-├────────────────────────────────────────────┤
-│ Issues por Severidad Ejecución (full)      │
-└────────────────────────────────────────────┘
-```
-
-### **Sección 3: Efectividad** (Grid 2 columnas destacadas)
-```
-┌─────────────────────┬─────────────────────┐
-│  Efectividad Ciclo 1│ Efectividad Ciclos  │
-│    (destacado)      │        QA           │
-├─────────────────────┼─────────────────────┤
-│  Efectividad UAT    │ Efectividad Gral    │
-│                     │                     │
-└─────────────────────┴─────────────────────┘
-```
+**NOTA v2.1:** Todos los 6 KPIs de CP ahora muestran tendencia mensual
 
 ### **Sección 4: Desviaciones** (Grid vertical)
 ```
@@ -651,36 +732,10 @@ Horas Desviación: {valor} hrs
 │ Horas Desviación    │                     │
 │      Total          │                     │
 ├─────────────────────┴─────────────────────┤
-│ Horas Desviación por Proyecto (full)      │
-│         (Bar Chart horizontal)             │
+│ Composición de Desviaciones (full width)  │
+│    (Donut Chart + Tabla)                  │
 └────────────────────────────────────────────┘
 ```
-
----
-
-## 🎨 Reglas de Formato
-
-### **Números:**
-- Enteros: Separador de miles con coma (ej: `1,250`)
-- Decimales: 1 cifra decimal (ej: `3.3`)
-- Porcentajes: 1 decimal + símbolo % (ej: `7.5%`)
-
-### **Fechas:**
-- Formato corto: `Ene 2025`, `Feb 2025`
-- Formato completo: `Enero 2025`
-
-### **Tooltips:**
-- Fondo: Blanco con sombra
-- Border: 1px solid #e5e7eb
-- Padding: 12px
-- Border radius: 8px
-- Fuente: 14px
-
-### **Animaciones:**
-- Entrada de tarjetas: Fade in con stagger de 100ms
-- Transición de valores: 300ms ease-in-out
-- Hover en gráficos: Scale 1.05
-- Hover en tarjetas: Elevación de sombra
 
 ---
 

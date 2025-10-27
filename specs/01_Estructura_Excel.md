@@ -1,6 +1,6 @@
 # 01 - Estructura del Archivo Excel
 
-**Última actualización:** 26 de octubre, 2025
+**Última actualización:** 27 de octubre, 2025
 
 ---
 

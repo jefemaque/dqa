@@ -1,7 +1,7 @@
 # 📊 Dashboard QA - Documentación Técnica
 
-**Última actualización:** 26 de octubre, 2025  
-**Versión:** 2.0
+**Última actualización:** 27 de octubre, 2025  
+**Versión:** 2.1
 
 ---
 
@@ -21,7 +21,8 @@
 
 ### 📊 Visualización de KPIs
 - **[04_KPIs_Visualizacion.md](./04_KPIs_Visualizacion.md)**  
-  Especificaciones de cómo mostrar cada KPI: totalizados, mensuales, gráficas, colores, semáforos.
+  Especificaciones de cómo mostrar cada KPI: totalizados, mensuales, gráficas, colores, semáforos.  
+  **✨ v2.1:** Meses en español (ENE, FEB, MAR...), CP sin decimales con coma, composición de desviaciones.
 
 ### 🔗 Mapeo de Campos
 - **[05_Mapeo_Campos_Formulas.md](./05_Mapeo_Campos_Formulas.md)**  
@@ -29,17 +30,18 @@
 
 ### 🎨 Especificaciones del Dashboard
 - **[06_Especificaciones_Dashboard.md](./06_Especificaciones_Dashboard.md)**  
-  Layout, filtros globales, secciones, diseño visual, Gantt y experiencia de usuario.
+  Layout, filtros globales, secciones, diseño visual, Gantt y experiencia de usuario.  
+  **✨ v2.1:** Gantt confirmado, composición de desviaciones.
 
 ---
 
 ## 🎯 Resumen Ejecutivo
 
 ### KPIs Totales: 21
-- **Casos de Prueba:** 6 KPIs
+- **Casos de Prueba:** 6 KPIs (TODOS con tendencia mensual)
 - **Defectos:** 9 KPIs (incluyendo separación Shift Left vs Ejecución)
 - **Efectividad:** 4 KPIs (Ciclo 1, Ciclos QA, UAT, Ejecución)
-- **Desviaciones:** 2 KPIs
+- **Desviaciones:** 2 KPIs (Total + Composición por tipo)
 
 ### Columnas Excel: 24
 - 6 columnas de identificación y clasificación
@@ -57,12 +59,12 @@
 - Estado
 
 ### Secciones del Dashboard: 6
-1. Casos de Prueba
+1. Casos de Prueba (con tendencias mensuales)
 2. Defectos (con separación Shift Left/Ejecución)
 3. Efectividad
-4. Desviaciones
-5. Tendencias Mensuales
-6. Gantt (collapsible)
+4. Desviaciones (con composición por tipo)
+5. Tendencias Mensuales (con meses en español)
+6. **Gantt (collapsible)** - Vista general y detallada
 
 ---
 
@@ -92,6 +94,15 @@
 ### **Diferencia Dias vs MTTR**
 - **Columna "Dias":** Días hábiles de duración de cada actividad (NO relacionado con MTTR)
 - **Columna "MTTR":** Tiempo medio de reparación de defectos, pre-calculado en días hábiles
+
+### **Formato de Meses (v2.1)**
+- **Formato:** ENE, FEB, MAR, ABR, MAY, JUN, JUL, AGO, SEP, OCT, NOV, DIC
+- **Mostrar:** TODOS los 12 meses aunque no haya datos
+- **Aplicación:** Todos los gráficos de tendencia mensual
+
+### **Formato de Números CP (v2.1)**
+- **Formato:** `1,250 CP` (sin decimales, coma como separador de miles)
+- **Aplicación:** Los 6 KPIs de Casos de Prueba
 
 ---
 
@@ -125,6 +136,7 @@
 
 | Versión | Fecha | Cambios |
 |---------|-------|---------|
+| 2.1 | 2025-10-27 | Meses en español (ENE, FEB, MAR...), CP sin decimales con coma, tendencias mensuales para TODOS los CP, composición de desviaciones, confirmación Gantt |
 | 2.0 | 2025-10-26 | Refinamiento completo: separación Issues Shift Left/Ejecución, ajuste Escape Rates, eliminación KPIs de esfuerzo, adición sección Gantt |
 | 1.0 | 2025-10-25 | Documentación inicial completa |
 
@@ -133,7 +145,8 @@
 ## 🎯 Próximos Pasos
 
 1. ✅ Validar fórmulas con datos reales del Excel
-2. ✅ Prototipar componentes clave (Gantt, Gauges, Stacked Areas)
+2. ✅ Prototipar componentes clave (Gantt, Gauges, Donut Chart de desviaciones)
 3. ✅ Implementar lógica de filtros y estado del proyecto
 4. ✅ Desarrollar vista de Gantt con doble comportamiento
-5. ✅ Generar mockups visuales del dashboard
+5. ✅ Implementar formato de meses en español
+6. ✅ Generar mockups visuales del dashboard

@@ -1,6 +1,7 @@
 # 06 - Especificaciones del Dashboard QA
 
-**Última actualización:** 26 de octubre, 2025
+**Última actualización:** 27 de octubre, 2025  
+**Versión:** 2.1
 
 ---
 
@@ -10,7 +11,8 @@ Este documento define las especificaciones completas del Dashboard QA, incluyend
 - Estructura y layout
 - Filtros globales
 - Secciones y organización
-- Sección Gantt (collapsible)
+- **✨ v2.1: Gantt confirmado con doble vista**
+- **✨ v2.1: Composición de Desviaciones (Donut Chart)**
 - Interactividad y UX
 
 ---
@@ -77,109 +79,6 @@ Proporcionar una vista consolidada y en tiempo real de las métricas de QA, perm
 
 ---
 
-### **Comportamiento de Filtros (Cascada)**
-
-```
-Año
-  ↓
-Cartera → Subcartera → Proyecto
-              ↓           ↓
-            Estado ← ← ← ← ←
-```
-
-**Reglas:**
-1. Al cambiar **Cartera**, se actualizan las opciones de **Subcartera** y **Proyecto**
-2. Al cambiar **Subcartera**, se actualizan las opciones de **Proyecto**
-3. **Estado** es independiente pero afecta el cálculo de Estado del Proyecto
-4. Los filtros se aplican en **tiempo real** (sin botón "Aplicar")
-5. Los filtros persisten en **localStorage**
-
----
-
-### **UI de Filtros**
-
-```jsx
-<div className="bg-white p-6 rounded-xl shadow-md mb-6">
-  <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-    
-    {/* Filtro Año */}
-    <div>
-      <label className="block text-sm font-medium text-gray-700 mb-2">
-        Año
-      </label>
-      <Select value={año} onChange={handleAñoChange}>
-        <option value="">Todos</option>
-        {años.map(a => <option key={a} value={a}>{a}</option>)}
-      </Select>
-    </div>
-
-    {/* Filtro Cartera */}
-    <div>
-      <label className="block text-sm font-medium text-gray-700 mb-2">
-        Cartera
-      </label>
-      <Select value={cartera} onChange={handleCarteraChange}>
-        <option value="">Todas</option>
-        {carteras.map(c => <option key={c} value={c}>{c}</option>)}
-      </Select>
-    </div>
-
-    {/* Filtro Subcartera */}
-    <div>
-      <label className="block text-sm font-medium text-gray-700 mb-2">
-        Subcartera
-      </label>
-      <MultiSelect
-        options={subcarteras}
-        selected={subcarterasSeleccionadas}
-        onChange={handleSubcarteraChange}
-        placeholder="Seleccionar..."
-      />
-    </div>
-
-    {/* Filtro Proyecto */}
-    <div>
-      <label className="block text-sm font-medium text-gray-700 mb-2">
-        Proyecto
-      </label>
-      <MultiSelect
-        options={proyectos}
-        selected={proyectosSeleccionados}
-        onChange={handleProyectoChange}
-        placeholder="Seleccionar..."
-      />
-    </div>
-
-    {/* Filtro Estado */}
-    <div>
-      <label className="block text-sm font-medium text-gray-700 mb-2">
-        Estado
-      </label>
-      <div className="space-y-2">
-        <Checkbox 
-          checked={estados.terminado}
-          onChange={() => toggleEstado('terminado')}
-          label="Terminado"
-        />
-        <Checkbox 
-          checked={estados.enCurso}
-          onChange={() => toggleEstado('enCurso')}
-          label="En curso"
-        />
-        <Checkbox 
-          checked={estados.porIniciar}
-          onChange={() => toggleEstado('porIniciar')}
-          label="Por iniciar"
-        />
-      </div>
-    </div>
-
-  </div>
-</div>
-```
-
----
-
 ## 📐 Layout del Dashboard
 
 ### **Estructura General**
@@ -191,72 +90,45 @@ Cartera → Subcartera → Proyecto
 │                                                             │
 │  SECCIÓN 1: CASOS DE PRUEBA (6 KPIs)                      │
 │  Grid 3 columnas × 2 filas                                 │
+│  ✨ v2.1: TODOS con tendencia mensual (meses español)     │
 │  ┌──────────┬──────────┬──────────┐                       │
 │  │ Diseñados│  Nuevos  │Modificados│                       │
+│  │+Tendencia│+Tendencia│+Tendencia │                       │
 │  ├──────────┼──────────┼──────────┤                       │
 │  │Reutiliz. │Automatiz.│Ejecutados│                       │
+│  │+Tendencia│+Tendencia│+Tendencia │                       │
 │  └──────────┴──────────┴──────────┘                       │
 │                                                             │
 ├────────────────────────────────────────────────────────────┤
 │                                                             │
 │  SECCIÓN 2: DEFECTOS (9 KPIs)                             │
 │  Grid mixto + Gráficos apilados                            │
-│  ┌──────────┬──────────┬────────────────┐                 │
-│  │  Shift   │ Ejecución│ Total Issues   │                 │
-│  │   Left   │          │  (destacado)   │                 │
-│  ├──────────┼──────────┼────────────────┤                 │
-│  │ Escape   │  Escape  │     MTTR       │                 │
-│  │   UAT    │Productivo│                │                 │
-│  │ (gauge)  │ (gauge)  │                │                 │
-│  ├──────────┴──────────┴────────────────┤                 │
-│  │ Issues No Resueltos                  │                 │
-│  ├──────────────────────────────────────┤                 │
-│  │ Issues por Severidad - Shift Left    │                 │
-│  │ (Stacked Area Chart - Full Width)    │                 │
-│  ├──────────────────────────────────────┤                 │
-│  │ Issues por Severidad - Ejecución     │                 │
-│  │ (Stacked Area Chart - Full Width)    │                 │
-│  └──────────────────────────────────────┘                 │
 │                                                             │
 ├────────────────────────────────────────────────────────────┤
 │                                                             │
 │  SECCIÓN 3: EFECTIVIDAD (4 KPIs)                          │
 │  Grid 2 columnas × 2 filas (destacadas)                   │
-│  ┌─────────────────────┬─────────────────────┐            │
-│  │ Efectividad Ciclo 1 │ Efectividad Ciclos  │            │
-│  │    (destacado)      │        QA           │            │
-│  ├─────────────────────┼─────────────────────┤            │
-│  │  Efectividad UAT    │ Efectividad General │            │
-│  │                     │                     │            │
-│  └─────────────────────┴─────────────────────┘            │
 │                                                             │
 ├────────────────────────────────────────────────────────────┤
 │                                                             │
-│  SECCIÓN 4: DESVIACIONES (2 KPIs)                         │
+│  SECCIÓN 4: DESVIACIONES (2 KPIs) ✨ v2.1 ACTUALIZADO     │
 │  ┌─────────────────────┬─────────────────────┐            │
 │  │ Horas Desviación    │                     │            │
 │  │      Total          │                     │            │
 │  ├─────────────────────┴─────────────────────┤            │
-│  │ Horas Desviación por Proyecto             │            │
-│  │       (Bar Chart horizontal)              │            │
+│  │ Composición de Desviaciones (full width)  │            │
+│  │    (Donut Chart + Tabla)                  │            │
 │  └───────────────────────────────────────────┘            │
 │                                                             │
 ├────────────────────────────────────────────────────────────┤
 │                                                             │
 │  SECCIÓN 5: TENDENCIAS MENSUALES                          │
 │  Tabs: CP | Defectos | Efectividad                        │
-│  ┌────────────────────────────────────────────┐           │
-│  │ [Casos de Prueba] [Defectos] [Efectividad]│           │
-│  ├────────────────────────────────────────────┤           │
-│  │                                             │           │
-│  │  Gráficos de línea con múltiples series    │           │
-│  │  (según tab seleccionado)                  │           │
-│  │                                             │           │
-│  └────────────────────────────────────────────┘           │
+│  ✨ v2.1: Meses en español (ENE, FEB, MAR...)             │
 │                                                             │
 ├────────────────────────────────────────────────────────────┤
 │                                                             │
-│  ▼ SECCIÓN 6: GANTT (Collapsible) 📅                     │
+│  ▼ SECCIÓN 6: GANTT (Collapsible) 📅 ✨ CONFIRMADO       │
 │  [Vista General: Proyectos | Vista Detallada: Actividades]│
 │  ┌────────────────────────────────────────────┐           │
 │  │                                             │           │
@@ -270,143 +142,7 @@ Cartera → Subcartera → Proyecto
 
 ---
 
-## 📋 Desglose por Sección
-
-### **HEADER**
-
-**Contenido:**
-- Logo de la organización (izquierda)
-- Título: "Dashboard QA - Métricas de Calidad"
-- Fecha de última actualización
-- Botón de refresh (opcional)
-
-**Altura:** ~80px  
-**Fondo:** Blanco con sombra sutil
-
----
-
-### **SECCIÓN 1: CASOS DE PRUEBA**
-
-**Grid:** 3 columnas × 2 filas  
-**Gap:** 16px  
-**Responsive:** 
-- Desktop: 3 columnas
-- Tablet: 2 columnas
-- Mobile: 1 columna
-
-**KPIs:**
-1. CP Diseñados (Verde)
-2. CP Nuevos (Azul)
-3. CP Modificados (Cyan)
-4. CP Reutilizados (Gris)
-5. CP Automatizados (Púrpura)
-6. CP Ejecutados (Azul oscuro)
-
-**Cada Card:**
-- Valor totalizado grande
-- Gráfico de línea pequeño (tendencia últimos 6 meses)
-- Icono representativo
-
----
-
-### **SECCIÓN 2: DEFECTOS**
-
-**Layout Especial:**
-
-**Fila 1:** 3 columnas
-- Issues Shift Left (Card estándar)
-- Issues Ejecución (Card estándar)
-- **Total Issues (Card destacada - 1.5x tamaño)**
-
-**Fila 2:** 3 columnas
-- Escape Rate UAT (Gauge)
-- Escape Rate Productivo (Gauge)
-- MTTR Promedio (Card con semáforo)
-
-**Fila 3:** 1 columna
-- Issues No Resueltos (Card ancho completo)
-
-**Fila 4:** 1 columna
-- Issues por Severidad Shift Left (Stacked Area - Full Width)
-
-**Fila 5:** 1 columna
-- Issues por Severidad Ejecución (Stacked Area - Full Width)
-
----
-
-### **SECCIÓN 3: EFECTIVIDAD**
-
-**Grid:** 2 columnas × 2 filas  
-**Gap:** 20px
-
-**KPIs:**
-1. % Efectividad Ciclo 1 (Destacado - naranja)
-2. % Efectividad Ciclos QA (Azul)
-3. % Efectividad UAT (Púrpura)
-4. % Efectividad Ejecución (Verde)
-
-**Cada Card:**
-- Badge de semáforo (🟢🟡🔴)
-- Valor porcentual grande
-- Gráfico de línea con meta de 90%
-
----
-
-### **SECCIÓN 4: DESVIACIONES**
-
-**Layout:**
-
-**Fila 1:** 2 columnas
-- Horas Desviación Total (Card)
-- (Espacio para KPI futuro)
-
-**Fila 2:** Full width
-- Horas Desviación por Proyecto (Bar Chart horizontal)
-  - Top 10 proyectos
-  - Ordenado descendente
-  - Color: Rojo con gradiente
-
----
-
-### **SECCIÓN 5: TENDENCIAS MENSUALES**
-
-**Estructura:**
-- **Tabs:** 3 pestañas
-  1. Casos de Prueba
-  2. Defectos
-  3. Efectividad
-
-**Tab 1: Casos de Prueba**
-- Gráfico de línea múltiple con 6 series:
-  - CP Diseñados
-  - CP Nuevos
-  - CP Modificados
-  - CP Reutilizados
-  - CP Automatizados
-  - CP Ejecutados
-
-**Tab 2: Defectos**
-- Gráfico de área apilada con series:
-  - Issues Shift Left
-  - Issues Ejecución
-  - MTTR (eje secundario)
-
-**Tab 3: Efectividad**
-- Gráfico de línea múltiple con 4 series:
-  - Efectividad Ciclo 1
-  - Efectividad Ciclos QA
-  - Efectividad UAT
-  - Efectividad General
-  - Línea de meta al 90%
-
-**Eje X:** Últimos 12 meses  
-**Interactividad:** 
-- Hover para tooltip detallado
-- Click en leyenda para ocultar/mostrar serie
-
----
-
-## 📅 SECCIÓN 6: GANTT (Collapsible)
+## 📅 SECCIÓN 6: GANTT (Collapsible) ✨ CONFIRMADO
 
 ### **Ubicación y Comportamiento**
 
@@ -556,21 +292,6 @@ Smoke Productivo                       │ 26/03/2025  │ 30/03/2025  │ [    
 - 🔵 En curso: `#3b82f6` (Azul)
 - 🔘 Por iniciar: `#6b7280` (Gris)
 
-**Colores Alternativos (por Tipo de Actividad):**
-```javascript
-const coloresPorTipo = {
-  'Analisis y Dimensionamiento': '#8b5cf6', // Morado
-  'Diseño de escenarios': '#8b5cf6',
-  'Datos, Insumos y Ambientes': '#8b5cf6',
-  'Pruebas QA Ciclo': '#3b82f6', // Azul (todos los ciclos)
-  'Pruebas UAT': '#10b981', // Verde
-  'Pruebas Preproductivas': '#10b981',
-  'Smoke Productivo': '#06b6d4', // Cyan
-  'Estabilización Productiva': '#06b6d4',
-  'Retraso': '#ef4444' // Rojo
-};
-```
-
 **Tooltip Detallado:**
 ```
 Actividad: Pruebas QA Ciclo 1
@@ -663,7 +384,7 @@ if (!row['F.inicio Real'] && !row['F.Fin Real']) {
       <GanttChart
         data={actividadesPorProyecto}
         viewMode="actividad"
-        colorBy="estado" // o "tipo"
+        colorBy="estado"
         showTooltip={true}
         onBarClick={handleActividadClick}
       />
@@ -707,45 +428,7 @@ if (!row['F.inicio Real'] && !row['F.Fin Real']) {
 #### **Leyenda**
 - Mostrar leyenda de colores según el modo:
   - Vista General: Estados del Proyecto
-  - Vista Detallada: Estados de Actividad (o Tipos)
-
-#### **Milestones (Opcional)**
-- Mostrar hitos importantes como diamantes:
-  - Fin de Ciclo 1
-  - Inicio de UAT
-  - Go-Live (Smoke Productivo)
-
----
-
-### **Librerías Recomendadas**
-
-**Opción 1: frappe-gantt** (Recomendada)
-```bash
-npm install frappe-gantt
-```
-- Simple y ligero
-- Buena interactividad
-- Fácil personalización
-
-**Opción 2: react-gantt-timeline**
-```bash
-npm install react-gantt-timeline
-```
-- Componente React nativo
-- Más control sobre UI
-
-**Opción 3: dhtmlx-gantt**
-```bash
-npm install dhtmlx-gantt
-```
-- Más robusto y features
-- Ideal para proyectos enterprise
-- Licencia comercial para uso avanzado
-
-**Opción 4: Recharts custom**
-- Usar Recharts con configuración personalizada
-- Mantiene consistencia con el resto del dashboard
-- Mayor trabajo de desarrollo
+  - Vista Detallada: Estados de Actividad
 
 ---
 
@@ -776,37 +459,6 @@ small: font-size: 14px
 
 /* KPI Values */
 kpi-value: font-size: 36px, font-weight: 700
-```
-
-### **Espaciado**
-
-```css
-/* Secciones */
-section-margin: 32px
-section-padding: 24px
-
-/* Cards */
-card-padding: 24px
-card-gap: 16px
-
-/* Responsive */
-@media (max-width: 768px) {
-  section-margin: 16px;
-  card-padding: 16px;
-}
-```
-
-### **Sombras**
-
-```css
-/* Card */
-box-shadow: 0 1px 3px rgba(0,0,0,0.1)
-
-/* Card Hover */
-box-shadow: 0 4px 6px rgba(0,0,0,0.1)
-
-/* Modal */
-box-shadow: 0 10px 25px rgba(0,0,0,0.15)
 ```
 
 ---
@@ -871,28 +523,6 @@ box-shadow: 0 10px 25px rgba(0,0,0,0.15)
 
 ---
 
-## ⚡ Performance
-
-### **Optimizaciones**
-
-1. **Carga Diferida:**
-   - Sección Gantt: Solo renderizar cuando se expande
-   - Gráficos: Virtualización para grandes datasets
-
-2. **Memoización:**
-   - Usar `useMemo` para cálculos de KPIs
-   - Usar `React.memo` para componentes de cards
-
-3. **Filtros:**
-   - Debounce en filtros de texto (300ms)
-   - Throttle en scroll del Gantt (100ms)
-
-4. **Datos:**
-   - Procesar Excel en Web Worker
-   - Caché de cálculos en IndexedDB
-
----
-
 ## 🔗 Stack Tecnológico Recomendado
 
 ### **Frontend Framework**
@@ -916,92 +546,6 @@ box-shadow: 0 10px 25px rgba(0,0,0,0.15)
 
 ### **Excel Processing**
 - **xlsx** o **exceljs** (lectura de Excel)
-- **papaparse** (alternativa para CSV)
-
----
-
-## 📊 Flujo de Datos
-
-```
-Excel File
-    ↓
-[File Upload]
-    ↓
-[Parse Excel] → Web Worker
-    ↓
-[Validate Data]
-    ↓
-[Store in State] → Zustand
-    ↓
-[Apply Filters] ← User Input
-    ↓
-[Calculate KPIs] → useMemo
-    ↓
-[Render Dashboard]
-    ↓
-┌─────────────────┐
-│  21 KPIs Cards  │
-│  + Gráficos     │
-│  + Gantt        │
-└─────────────────┘
-```
-
----
-
-## 🚀 Roadmap de Implementación
-
-### **Fase 1: Base (2-3 semanas)**
-- ✅ Setup proyecto
-- ✅ Componentes UI base
-- ✅ Procesamiento de Excel
-- ✅ Filtros globales
-- ✅ Sección 1: Casos de Prueba
-
-### **Fase 2: KPIs Core (2-3 semanas)**
-- ✅ Sección 2: Defectos
-- ✅ Sección 3: Efectividad
-- ✅ Sección 4: Desviaciones
-- ✅ Validación de fórmulas
-
-### **Fase 3: Visualizaciones Avanzadas (2 semanas)**
-- ✅ Sección 5: Tendencias Mensuales
-- ✅ Gráficos apilados
-- ✅ Gauges con semáforos
-- ✅ Tooltips enriquecidos
-
-### **Fase 4: Gantt (1-2 semanas)**
-- ✅ Vista General (proyectos)
-- ✅ Vista Detallada (actividades)
-- ✅ Interactividad y zoom
-- ✅ Integración con filtros
-
-### **Fase 5: Polish y Testing (1 semana)**
-- ✅ Responsividad
-- ✅ Performance optimization
-- ✅ Testing con datos reales
-- ✅ Documentación de usuario
-
-**Total estimado: 8-11 semanas**
-
----
-
-## 📝 Notas Finales
-
-### **Consideraciones Importantes**
-
-1. **Estado del Proyecto es calculado:** No viene del Excel, se deriva del estado de todas las actividades
-
-2. **MTTR viene pre-calculado:** No se calcula en el dashboard, solo se promedia
-
-3. **Gantt tiene doble comportamiento:** Vista general vs detallada según filtro de proyecto
-
-4. **Fechas faltantes en Gantt:** Las actividades sin fechas NO se muestran
-
-5. **Escape Rates tienen denominadores específicos:** 
-   - UAT: Solo Ciclos QA
-   - Productivo: Todo en Ejecución
-
-6. **Columna "Dias" NO se usa:** Reservada para futuras métricas
 
 ---
 
