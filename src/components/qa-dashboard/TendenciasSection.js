@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Nav } from 'react-bootstrap';
 import { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine } from 'recharts';
+import { formatearMesEspañol, formatearNumeroCP } from '../../utils/formatUtils';
 
 const TendenciasSection = ({ tendencias }) => {
   const [activeTab, setActiveTab] = useState('casos');
@@ -11,7 +12,7 @@ const TendenciasSection = ({ tendencias }) => {
 
   // Preparar datos para casos de prueba
   const datosCasos = tendencias.map(t => ({
-    mes: t.mes.substring(5),
+    mes: formatearMesEspañol(t.mes),
     Diseñados: t.cpDiseñados,
     Nuevos: t.cpNuevos,
     Modificados: t.cpModificados,
@@ -22,7 +23,7 @@ const TendenciasSection = ({ tendencias }) => {
 
   // Preparar datos para defectos
   const datosDefectos = tendencias.map(t => ({
-    mes: t.mes.substring(5),
+    mes: formatearMesEspañol(t.mes),
     'Shift Left': t.issuesShiftLeft,
     'Ejecución': t.issuesEjecucion,
     'MTTR': t.mttrPromedio
@@ -30,7 +31,7 @@ const TendenciasSection = ({ tendencias }) => {
 
   // Preparar datos para efectividad
   const datosEfectividad = tendencias.map(t => ({
-    mes: t.mes.substring(5),
+    mes: formatearMesEspañol(t.mes),
     'Ciclo 1': t.efectividadCiclo1,
     'Ciclos QA': t.efectividadCiclosQA,
     'UAT': t.efectividadUAT,

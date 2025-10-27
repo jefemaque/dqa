@@ -345,6 +345,37 @@ export const calcularHorasDesviacionPorProyecto = (data) => {
     .slice(0, 10); // Top 10
 };
 
+// KPI 22: Composición de Desviaciones (por tipo de retraso)
+export const calcularComposicionDesviaciones = (data) => {
+  const tiposRetraso = ACTIVIDADES.RETRASOS.map(actividad => ({
+    actividad,
+    nombre: actividad
+      .replace('Retraso por ', '')
+      .replace('Retraso po ', '') // Typo intencional del Excel
+  }));
+
+  const composicion = tiposRetraso.map(tipo => {
+    const horas = data
+      .filter(row => row.Actividad === tipo.actividad)
+      .reduce((sum, row) => sum + row.Horas, 0);
+
+    return {
+      tipo: tipo.nombre,
+      horas: horas
+    };
+  });
+
+  const totalHoras = composicion.reduce((sum, item) => sum + item.horas, 0);
+
+  return composicion
+    .map(item => ({
+      ...item,
+      porcentaje: totalHoras > 0 ? ((item.horas / totalHoras) * 100).toFixed(1) : 0
+    }))
+    .filter(item => item.horas > 0) // Solo mostrar tipos con datos
+    .sort((a, b) => b.horas - a.horas);
+};
+
 // Calcular todos los KPIs
 export const calcularTodosLosKPIs = (data) => {
   return {
@@ -375,7 +406,8 @@ export const calcularTodosLosKPIs = (data) => {
 
     // Desviaciones
     horasDesviacion: calcularHorasDesviacion(data),
-    horasDesviacionPorProyecto: calcularHorasDesviacionPorProyecto(data)
+    horasDesviacionPorProyecto: calcularHorasDesviacionPorProyecto(data),
+    composicionDesviaciones: calcularComposicionDesviaciones(data)
   };
 };
 
