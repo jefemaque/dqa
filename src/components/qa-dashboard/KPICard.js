@@ -1,4 +1,6 @@
-const KPICard = ({ title, value, icon, color, subtitle, trend, badge }) => {
+import { LineChart, Line, ResponsiveContainer } from 'recharts';
+
+const KPICard = ({ title, value, icon, color, subtitle, trend, badge, sparklineData }) => {
   return (
     <div className="kpi-card bg-white rounded shadow-sm p-4 h-100">
       <div className="d-flex justify-content-between align-items-start mb-3">
@@ -40,6 +42,23 @@ const KPICard = ({ title, value, icon, color, subtitle, trend, badge }) => {
             )}
             {Math.abs(trend.value)}% vs mes anterior
           </small>
+        </div>
+      )}
+
+      {/* Mini gráfico de línea (sparkline) */}
+      {sparklineData && sparklineData.length > 0 && (
+        <div className="mt-3" style={{ height: '50px' }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={sparklineData}>
+              <Line
+                type="monotone"
+                dataKey="valor"
+                stroke={color}
+                strokeWidth={2}
+                dot={false}
+              />
+            </LineChart>
+          </ResponsiveContainer>
         </div>
       )}
     </div>
